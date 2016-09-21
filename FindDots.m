@@ -28,7 +28,7 @@ for r=1:regAll.Count
     % Number of white pixels
     pixOverlap(r) = Overlap( regAll.PixelList(r), imTh );
 
-    if pixOverlap(r) > 0.5
+    if pixOverlap(r) > 0.2
         regKeep(r) = true;
     end
 end
