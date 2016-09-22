@@ -109,16 +109,16 @@ for c = 1:nCameras
         nRows = 2;
         nCols = 3;
         subplot(nRows, nCols, 1)
-        imshow( imFrame );
+        imshow( imInitial );
         hold on;
         plot( ptsToTrack(1,:), ptsToTrack(2,:), '+c', 'MarkerSize', 20 );
-        title('Original image with points');
+        title('Original image with clicked points');
         
         subplot(nRows, nCols, 2)
         imshow( imFrame );
         hold on;
         plot( ptsOrig(1,:), ptsOrig(2,:), '+c', 'MarkerSize', 20)
-        title('Clicked points');
+        title('New frame with points');
         
         subplot(nRows, nCols, 3)
         imshow( imT );
@@ -133,6 +133,13 @@ for c = 1:nCameras
         title('Culled features');
         
         subplot(nRows, nCols, 5)
+        imshow( imClip );
+        hold on;
+        plot(regAll);
+        plot( ptsToTrack(1,:) - imClipRec(1), ptsToTrack(2,:) - imClipRec(2), '+r');
+        title('All features with points');
+        
+        subplot(nRows, nCols, 6)
         ShowCloseupWithPts( imFrame, ptsToTrack );
         title('Points to track');
         

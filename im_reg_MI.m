@@ -1,4 +1,4 @@
-function [h,im_matched, theta,I,J]=im_reg_MI(image1, image2, angle, step);
+function [h, theta,I,J]=im_reg_MI(image1, image2, angle, step);
 % function [h,im_matched, theta,I,J]=im_reg_MI(image1, image2, angle, step);
 %
 % function for registering image 1 and image 2 using Mutual Information
@@ -64,22 +64,24 @@ for k=1:b
     for i=1:step:(m1-m)
         for j=1:step:(n1-n)
                 im2=image21(i:(i+m-1),j:(j+n-1)); % selecting part of IMAGE2 matching the size of IMAHE1
-                im2=round(im2); 
-                h(k,i,j)=MI2(im1,im2); % calculating MI
+                %im2=round(im2); 
+                h(k,i,j)=mean( mean( abs(im1 - im2) ) );
+                %h(k,i,j)=MI2(im1,im2); % calculating MI
             end
         end
     end
   
 
-[a, b] = max(h(:));% finding the max of MI and indecises
+[~, b] = min(h(:));% finding the max of MI and indecises
 [K,I,J] = ind2sub(size(h),b);
 
 theta=angle(K);
-im_rot = imrotate(image2, theta);
-im_matched=im_rot(I:(I+m-1),J:(J+n-1));
 
 bPlot = false;
 if bPlot
+    im_rot = imrotate(image2, theta);
+    im_matched=im_rot(I:(I+m-1),J:(J+n-1));
+    
     figure(4);
     subplot(2,2,1)
     imshow(image2)

@@ -18,8 +18,8 @@ imBlend =uint8( round( blend * double( imG ) + (1.0 - blend) * imTh ) );
 %imBlend(pixsTh) = imTh(pixsTh);
 %imBlend =uint8( round( blends(k) * double( rgb2gray( imOrig ) ) + (1.0 - blends(k)) * imTh ) );
 regAll = detectMSERFeatures(imBlend, 'RegionAreaRange', [1, 100], ...
-                            'ThresholdDelta', 0.8, ...
-                            'MaxAreaVariation', 0.3);
+                            'ThresholdDelta', 0.7, ...
+                            'MaxAreaVariation', 0.4);
 
 % Now get rid of features not in white areas
 regKeep = zeros( regAll.Count,1 ) == 1;
@@ -28,7 +28,8 @@ for r=1:regAll.Count
     % Number of white pixels
     pixOverlap(r) = Overlap( regAll.PixelList(r), imTh );
 
-    if pixOverlap(r) > 0.2
+    % You can safely set this pretty low - but should be bigger than 0
+    if pixOverlap(r) > 0.01
         regKeep(r) = true;
     end
 end

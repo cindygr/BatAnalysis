@@ -1,7 +1,7 @@
 %% See about automatically fitting the dots on the bat's face
 % Version 1: Tries to track dots through images
 %  Uses TrackPoints as the main file
-%  I gave up on this approa
+%  I gave up on this approach
 
 % Where the data is located
 dataDir = '9-15bat/5/';

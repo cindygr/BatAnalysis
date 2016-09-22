@@ -14,7 +14,7 @@
 %   -TrackPt-.mat is the xy points that were picked on the image
 %   -TrackPt-.fig is a figure which shows the picked points "snapped" to the features
 %         Make sure that this is correct or nothing will work...
-							%         Some ways to fix: 
+%         Some ways to fix: 
 %    The upper right image is all the features it has to select from. If there isn't
 %    at least one green circle over each dot then you need to make detectMSERFeatures in
 %    FindDots.m be a little less picky by changing the two parameters (decrease ThresholdDelta or 
@@ -40,9 +40,12 @@
 
 % Where the data is located
 strDir = '9-15bat/5/';
-pulseStart = 1;
-pulseEnd = 2; % use -1 to go to the end
-name = 'Nose';
+pulseStart = 3;
+pulseEnd = 3; % use -1 to go to the end
+name = 'Ear';
 
-xyPointsAll = StartFindInFrames( strDir, pulseStart, pulseEnd, name )
+% Bail to the debugger if something goes boom
+dbstop if error;
+
+xyPointsAll = StartFindInFrames( strDir, pulseStart, pulseStart, name );
 

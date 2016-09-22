@@ -32,8 +32,8 @@ xyPointsAll = zeros( nFrames, 2, nPts );
 frameNumbers = frameBacktrack:frameEnd;
 
 % For drawing output
-nRows = 5;
-nCols = 7;
+nRows = 2;
+nCols = 3;
 count = 1;
 
 % For doing image template search
@@ -60,30 +60,72 @@ imSrc = rgb2gray( imSrc );
 imTemplates = ImageTemplates( imOriginal, xyOrig, padDot );
 
 fprintf('Frame start %0.0f end %0.0f total %0.f\n', frameStart, frameEnd, nFrames);
+% Same images and draw at end
+%  Image, points, error
+imDraw = cell( nRows, nCols, 4 );
+
+bUseMatchAll = true;
 for f = fFrames
     fprintf(' %0.0f.. ', f);
     if f == frameStart
         xyGuess = xyOrig;
+        bUseMatchAll = true;
     end
-    xyPointsAll(f, :, :) = xyGuess;
-    imFrame = imread( sprintf('%s%s/1_%06.0f.jpg', strDir, strCamera, f ) );
-    xyShift = MatchTemplate( imSrc, imSrcRect, imSrcPts, imFrame, xyGuess, pad, padSearch );
-    xyGuess(1,:) = xyGuess(1,:) + xyShift(1);
-    xyGuess(2,:) = xyGuess(2,:) + xyShift(2);
     
-    xyAdjust = MatchAllTemplates( imTemplates, imFrame, xyGuess, padDot, padSearchDot );
+    imDraw{count, 1} = imread( sprintf('%s%s/1_%06.0f.jpg', strDir, strCamera, f ) );
+    imFrameGrayscale = rgb2gray( imDraw{count, 1}); % Matching is in gray scale
+    [xyShift, errAll] = MatchTemplate( imSrc, imSrcRect, imSrcPts, imFrameGrayscale, xyGuess, pad, padSearch );
+    if bUseMatchAll
+        xyGuess(1,:) = xyGuess(1,:) + xyShift(1);
+        xyGuess(2,:) = xyGuess(2,:) + xyShift(2);
+    end
+    
+    [xyAdjust, imDraw{count,3}, bOutOfBds] = MatchAllTemplates( imTemplates, imFrameGrayscale, xyGuess, padDot, padSearchDot );
+    driftErr = mean( sqrt(  (xyAdjust(1,:) - xyGuess(1,:)).^2 + (xyAdjust(2,:) - xyGuess(2,:)).^2 ) );
     %xyAdjust = MatchPointsIndividual( imOriginal, xyOrig, imFrame, xyGuess );
     xyPointsAll(f, :, :) = xyAdjust;
-    
+    % Uncomment this if the points are not moving as a unit (eg, the ear)
+    % May cause drift
+    if driftErr > padSearchDot / 2 || bOutOfBds || errAll > 0.05
+        fprintf('Adjusting match all drift %0.2f err %0.2f\n', driftErr, errAll);
+        %bUseMatchAll = false;
+        xyGuess = 0.5 * xyGuess + 0.5 * xyAdjust; 
+        figure(3);
+        clf
+        if count > 1
+            subplot(2,2,1);
+            ShowCloseupWithPts( imDraw{count-1,1}, imDraw{count-1,2} );
+            title('Guess');
+            subplot(2,2,2);
+            ShowCloseupWithPts( imDraw{count-1,1}, xyGuess );
+            title('Adjust');
+        end
+        subplot(2,2,3);
+        ShowCloseupWithPts( imDraw{count,1}, xyGuess );
+        title('Guess');
+        subplot(2,2,4);
+        ShowCloseupWithPts( imDraw{count,1}, xyAdjust );
+        title('Adjust');
+    end
+        
 % You could comment this out - or try to move it outside the loop.
-    figure(3);
-    subplot(nRows, nCols, count);
-    ShowCloseupWithPts( imFrame, xyGuess );
+    imDraw{count, 2} = xyAdjust;
+    imDraw{count, 4} = driftErr;
+    fprintf('%0.2f %0.2f, %0.2f ', imDraw{count,3}, imDraw{count,4}, errAll);
+    if mod( count, nCols ) == nCols-1
+        fprintf('\n');
+    end
     count = count + 1;
     if count > nRows * nCols || f == fFrames(end)
-        count = 1;
+        figure(3);
+        clf
+        for k = 1:size(imDraw,1)
+            subplot(nRows, nCols, k);
+            ShowCloseupWithPts( imDraw{k,1}, imDraw{k,2} );
+            title(sprintf('%0.0f,e=%0.2f,%0.2f', f-k-1, imDraw{k,3:4}) );
+        end
         savefig( strcat(strDir, 'pts', num2str(f, '%06.0f')) );
-        fprintf('\n');
+        count = 1;
     end
 end
 fprintf('Done\n');
