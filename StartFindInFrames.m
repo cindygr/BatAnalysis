@@ -55,6 +55,8 @@ else
         ptsClick(1,:) = ptsClick(1,:) + imClipRect(1);
         ptsClick(2,:) = ptsClick(2,:) + imClipRect(2);
         ptsOrigClick{c,1} = ptsClick;
+        
+        fprintf('Clicked %0.0f points\n', size(ptsClick(2) ));
     end
     save( strStartPts, 'ptsOrigClick' );
 end

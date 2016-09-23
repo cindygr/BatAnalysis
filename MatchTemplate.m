@@ -1,4 +1,4 @@
-function [ xyShift, err ] = MatchTemplate( imSrc, rectSrc, srcPts, imNext, nextPts, pad, padSearch )
+function [ xyShift, err ] = MatchTemplate( imSrc, rectSrc, srcPts, imNext, nextPts, pad, padSearch, bShow )
 %MatchTemplate Match the template cutout to the other image
 %  imSrc: template image
 % rectSrc: Where in the original source image the template came from
@@ -15,6 +15,9 @@ function [ xyShift, err ] = MatchTemplate( imSrc, rectSrc, srcPts, imNext, nextP
 
 if ~exist('padSearch', 'var')
     padSearch = 20;
+end
+if ~exist('bShow', 'var')
+    bShow = false;
 end
 
 % Cutout the search image from the full image
@@ -36,7 +39,7 @@ else
     % Parameters for match
     %  I don't adjust these very well
     [opt, metric] = imregconfig('multimodal');
-    opt.InitialRadius = 0.009;
+    opt.InitialRadius = 0.001;
     opt.GrowthFactor = 1.01;
     imRes = imregister( imSrc, imDest, 'translation', opt, metric );
     
@@ -56,6 +59,12 @@ else
     end
 
     % How good of a match?
+    if J+size(imSrc,2) >= size( imDest,2)
+        J = size( imDest,2) - size(imSrc,2) - 1;
+    end
+    if I+size(imSrc,1) >= size( imDest,1)
+        I = size( imDest,1) - size(imSrc,1) - 1;
+    end
     err = mean( mean( abs(imSrc - imDest( I:I+size(imSrc,1)-1,J:J+size(imSrc,2)-1 )) ) ) / 255.0;
 end
 
@@ -64,7 +73,6 @@ end
 % Shift - note, only works if no clipping in ClipImageToPoints
 xyShift = [J - padSearch - 1; I - padSearch - 1];
 
-bShow = false; %size(imSrc,1) < 16;
 if bShow
     figure(2);
     clf

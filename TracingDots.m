@@ -40,12 +40,37 @@
 
 % Where the data is located
 strDir = '9-15bat/5/';
-pulseStart = 3;
-pulseEnd = 3; % use -1 to go to the end
-name = 'Ear';
+pulseStart = 1;
+pulseEnd = -1; % use -1 to go to the end
+name = 'nose';
 
 % Bail to the debugger if something goes boom
 dbstop if error;
 
-xyPointsAll = StartFindInFrames( strDir, pulseStart, pulseStart, name );
+xyPointsAll = StartFindInFrames( strDir, pulseStart, pulseEnd, name );
 
+% Plot the movement over time with the frames
+xyLeft = xyPointsAll{1}.xyPoints;
+% center
+xyCenter = mean( xyLeft, 3 );
+xyLeftCentered = xyLeft;
+for f = 1:size(xyLeft,1)
+    xyLeftCentered(f,1,:) = xyLeft(f,1,:) - xyCenter(f,1);
+    xyLeftCentered(f,2,:) = xyLeft(f,2,:) - xyCenter(f,2);
+end
+xyMove = xyLeft(2:end,:,:) - xyLeft(1:end-1,:,:);
+xyMoveMag = squeeze( sqrt( xyMove(:,1,:).^2 + xyMove(:,2,:).^2 ) );
+xyMoveMagFrame = mean( xyMoveMag, 2 );
+
+clf
+plot( xyMoveMagFrame );
+hold on;
+% Frame numbers for each pulse
+[ fStart, fEnd, nPulses ] = ReadPulseStartEnd( strDir );
+
+for k = 1:nPulses
+    plot( [fStart(k), fEnd(k)], [0.5,0.5], 'o-g' );
+    plot( fEnd(k), 0.5, '+r' );
+end
+
+title('Movement');
