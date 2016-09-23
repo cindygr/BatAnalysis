@@ -29,12 +29,12 @@ for p = 1:nPts
 
         % don't go to edge - but flag this is a bad match
         if abs(xyShift(1)) > padEdge 
-            fprintf('Warning: fell out of image pt %0.0f\n', p);
+            fprintf('\nWarning: fell out of image pt %0.0f\n', p);
             bOutOfBds = true;
             xyShift(1) = 0;
         end
         if abs(xyShift(2)) > padEdge
-            fprintf('Warning: fell out of image pt %0.0f\n', p);
+            fprintf('\nWarning: fell out of image pt %0.0f\n', p);
             bOutOfBds = true;
             xyShift(2) = 0;
         end

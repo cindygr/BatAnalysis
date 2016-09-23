@@ -41,8 +41,8 @@
 % Where the data is located
 strDir = '9-15bat/5/';
 pulseStart = 1;
-pulseEnd = -1; % use -1 to go to the end
-name = 'nose';
+pulseEnd = 3; % use -1 to go to the end
+name = 'leftEar';
 
 % Bail to the debugger if something goes boom
 dbstop if error;
