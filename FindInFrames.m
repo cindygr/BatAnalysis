@@ -91,7 +91,7 @@ for f = fFrames
     %  adjust it a bit by the latest set of points
     % May cause drift
     if (driftErr > padSearchDot / 3 || errAll > 0.04)  && ~bOutOfBds && countAdjust < 0
-        fprintf('Adjusting match all drift %0.2f err %0.df, err In %0.3f\n', driftErr, errAll, imDraw{count,3});
+        fprintf('\nAdjusting match all drift %0.2f err %0.df, err In %0.3f\n', driftErr, errAll, imDraw{count,3});
         %bUseMatchAll = false;
         xyGuess = 0.75 * xyGuess + 0.25 * xyAdjust; 
 
@@ -121,7 +121,7 @@ for f = fFrames
         ShowCloseupWithPts( imDraw{count,1}, xyAdjust );
         title('Adjust');
         
-        savefig( strcat(strDir, 'bad_pts_', num2str(f, '%06.0f')) );
+        savefig( strcat(strDir, strCamera, 'bad_pts_', num2str(f, '%06.0f')) );
     end
     % Decrement ever round
     countAdjust = countAdjust - 1;
@@ -147,7 +147,7 @@ for f = fFrames
             ShowCloseupWithPts( imDraw{k,1}, imDraw{k,2} );
             title(sprintf('%0.0f,e=%0.3f,%0.3f', f-k-1, imDraw{k,3:4}) );
         end
-        savefig( strcat(strDir, 'pts', num2str(f, '%06.0f')) );
+        savefig( strcat(strDir, strCamera, 'pts', num2str(f, '%06.0f')) );
         count = 1;
     end
 end
